@@ -1,0 +1,9 @@
+admin:admin123:ADMIN
+test:123456:RIDER
+mufmoh:123456:OPERATOR
+ashif:123:OPERATOR
+testbook1:123:RIDER
+testbook2:123:RIDER
+test0:123:OPERATOR
+test1:123:RIDER
+test2:123:RIDER
