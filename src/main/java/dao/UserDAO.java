@@ -1,6 +1,7 @@
 package dao;
 
 import model.User;
+import model.UserFactory;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class UserDAO {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":");
                 if (parts.length == 3) {
-                    users.add(new User(parts[0], parts[1], parts[2]));
+                    users.add(UserFactory.createUser(parts[0], parts[1], parts[2]));
                 }
             }
         }

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Login - Bike Rental and Ride-Sharing Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link th:href="@{/assets/app-theme.css}" rel="stylesheet">
+</head>
+<body>
+<div class="container app-shell">
+  <div class="app-hero mb-4">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+      <div>
+        <h2 class="page-title">Welcome Back</h2>
+        <p class="mb-0">Sign in to access bookings, ride sharing, bike management, or the admin dashboard.</p>
+      </div>
+      <a th:href="@{/}" class="btn btn-outline-light">Back to Home</a>
+    </div>
+  </div>
+
+  <div class="app-form-card">
+    <div class="card app-card border-0">
+      <div class="card-header text-center app-gradient-primary">
+        <h4 class="mb-0">Bike Rental and Ride-Sharing Platform</h4>
+      </div>
+      <div class="card-body p-4 p-lg-5">
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+        <form th:action="@{/login}" method="post">
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" name="username" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+
+        <p class="app-muted small mt-3 mb-0">
+          Admins go to user management, operators go to fleet management, and riders go to ride bookings.
+        </p>
+
+        <div class="text-center mt-4">
+          <p class="mb-0">Don't have an account? <a th:href="@{/register}">Register here</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
