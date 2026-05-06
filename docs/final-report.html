@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Final Report - Bike Rental and Ride-Sharing Platform</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            color: #1f2937;
+            background: #f7fafc;
+            line-height: 1.5;
+        }
+        .page {
+            width: 900px;
+            margin: 24px auto;
+            background: #ffffff;
+            padding: 48px 56px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        }
+        h1, h2, h3 {
+            color: #0f172a;
+            margin-top: 0;
+        }
+        h1 {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 28px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        p, li {
+            font-size: 14px;
+        }
+        .muted {
+            color: #475569;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        .card {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            background: #f8fafc;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 13px;
+        }
+        th {
+            background: #e2e8f0;
+        }
+        code, pre {
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+        }
+        pre {
+            white-space: pre-wrap;
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 14px;
+            overflow: hidden;
+        }
+        ul {
+            margin-top: 8px;
+        }
+        .cover {
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+        .spacer {
+            height: 18px;
+        }
+        @media print {
+            body {
+                background: #ffffff;
+            }
+            .page {
+                box-shadow: none;
+                margin: 0 auto;
+                width: auto;
+                min-height: auto;
+                page-break-after: always;
+            }
+            .page:last-child {
+                page-break-after: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<section class="page cover">
+    <h1>Bike Rental and Ride-Sharing Platform</h1>
+    <p class="muted">Final Report</p>
+    <div class="spacer"></div>
+    <p><strong>Module:</strong> SE1020 Object Oriented Programming</p>
+    <p><strong>Assignment:</strong> Project</p>
+    <p><strong>Technology Stack:</strong> Java, Spring Boot, Thymeleaf, Bootstrap, File Handling</p>
+    <p><strong>Repository:</strong> https://github.com/ashifahmed-924/OOP-bike-rental-system</p>
+    <div class="spacer"></div>
+    <p><strong>Student Name:</strong> __________________________</p>
+    <p><strong>Student ID:</strong> __________________________</p>
+    <p><strong>Date:</strong> 2026-04-10</p>
+</section>
+
+<section class="page">
+    <h2>1. Introduction</h2>
+    <p>
+        This project is a web-based Bike Rental and Ride-Sharing Platform developed for the SE1020 Object Oriented Programming module.
+        The system allows users to register, log in, manage bikes, create ride bookings, and handle ride-sharing requests.
+        The backend is implemented using Java and Spring Boot, while file handling is used for data persistence instead of a database.
+    </p>
+
+    <h2>2. Objectives</h2>
+    <ul>
+        <li>Apply object-oriented programming concepts such as encapsulation, inheritance, abstraction, and polymorphism.</li>
+        <li>Implement CRUD operations for user management, bike management, and ride bookings.</li>
+        <li>Develop a user-friendly interface for different system roles.</li>
+        <li>Use file read/write operations for persistent storage.</li>
+        <li>Track development using Git and GitHub.</li>
+    </ul>
+
+    <h2>3. Technologies Used</h2>
+    <div class="grid">
+        <div class="card">
+            <strong>Backend</strong>
+            <ul>
+                <li>Java</li>
+                <li>Spring Boot</li>
+                <li>Spring MVC</li>
+                <li>Thymeleaf</li>
+            </ul>
+        </div>
+        <div class="card">
+            <strong>Frontend and Tooling</strong>
+            <ul>
+                <li>HTML / CSS</li>
+                <li>Bootstrap</li>
+                <li>Maven</li>
+                <li>GitHub</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>4. Main Features</h2>
+    <ul>
+        <li>User registration and login with role-based access.</li>
+        <li>Admin user management with create, search, update, and delete operations.</li>
+        <li>Operator bike management with add, update, and delete operations.</li>
+        <li>Rider bike booking and ride-sharing request handling.</li>
+        <li>Operator ride booking overview limited to bikes added by that operator.</li>
+        <li>File-based persistence using text files.</li>
+    </ul>
+
+    <h2>5. Project Structure</h2>
+    <ul>
+        <li><code>src/main/java/app</code> - Spring Boot application and controllers</li>
+        <li><code>src/main/java/model</code> - domain models and polymorphic user types</li>
+        <li><code>src/main/java/dao</code> - file-based data access objects</li>
+        <li><code>src/main/resources/templates</code> - Thymeleaf HTML templates</li>
+        <li><code>src/main/resources/static/assets</code> - CSS and image assets</li>
+        <li><code>src/main/webapp/data</code> - text files for persistence</li>
+    </ul>
+</section>
+
+<section class="page">
+    <h2>6. Object-Oriented Programming Concepts</h2>
+    <h3>Encapsulation</h3>
+    <p>
+        Encapsulation is used in the model classes through controlled access to data fields using getters and setters.
+        Examples include <code>Bike</code>, <code>RideBooking</code>, and <code>ShareRideRequest</code>.
+    </p>
+
+    <h3>Inheritance</h3>
+    <p>
+        Inheritance is used through the class hierarchy <code>Person -&gt; User -&gt; AdminUser / OperatorUser / RiderUser</code>.
+        This structure promotes reuse of common properties such as username and password.
+    </p>
+
+    <h3>Polymorphism</h3>
+    <p>
+        Polymorphism is implemented using specialized user subclasses. The system works with the abstract <code>User</code> type,
+        while each subclass provides its own implementation of <code>getRole()</code> and <code>getDashboardPath()</code>.
+        This allows the application to redirect users based on behavior defined by the actual runtime object.
+    </p>
+
+    <h3>Abstraction</h3>
+    <p>
+        The classes <code>Person</code> and <code>User</code> are abstract and define the common structure and required methods for all user types.
+    </p>
+
+    <h2>7. CRUD Operations</h2>
+    <table>
+        <tr>
+            <th>Module</th>
+            <th>Create</th>
+            <th>Read</th>
+            <th>Update</th>
+            <th>Delete</th>
+        </tr>
+        <tr>
+            <td>Users</td>
+            <td>Register / Add User</td>
+            <td>Search / List Users</td>
+            <td>Update User</td>
+            <td>Delete User</td>
+        </tr>
+        <tr>
+            <td>Bikes</td>
+            <td>Add Bike</td>
+            <td>List Bikes</td>
+            <td>Update Bike</td>
+            <td>Delete Bike</td>
+        </tr>
+        <tr>
+            <td>Ride Bookings</td>
+            <td>Create Booking</td>
+            <td>List Bookings</td>
+            <td>Update Booking</td>
+            <td>Delete Booking</td>
+        </tr>
+    </table>
+
+    <h2>8. File Handling</h2>
+    <p>The application stores data using text files instead of a relational database.</p>
+    <ul>
+        <li><code>users.txt</code> - stores usernames, passwords, and roles</li>
+        <li><code>bikes.txt</code> - stores bike records</li>
+        <li><code>ride-bookings.txt</code> - stores ride booking and share request details</li>
+    </ul>
+    <p>
+        File operations are handled through <code>UserDAO</code>, <code>BikeDAO</code>, and <code>RideBookingDAO</code>.
+    </p>
+</section>
+
+<section class="page">
+    <h2>9. Class Diagram</h2>
+    <p>The following Mermaid code represents the core class design of the system.</p>
+    <pre>classDiagram
+    class Person {
+        &lt;&lt;abstract&gt;&gt;
+        #String username
+        #String password
+        +getRole() String
+        +getDashboardPath() String
+    }
+
+    class User {
+        &lt;&lt;abstract&gt;&gt;
+        +toString() String
+    }
+
+    class AdminUser
+    class OperatorUser
+    class RiderUser
+    class UserFactory
+    class Bike
+    class RideBooking
+    class ShareRideRequest
+    class UserDAO
+    class BikeDAO
+    class RideBookingDAO
+    class BaseWebController
+    class PageController
+    class AuthController
+    class UserController
+    class BikeController
+    class RideBookingController
+
+    Person &lt;|-- User
+    User &lt;|-- AdminUser
+    User &lt;|-- OperatorUser
+    User &lt;|-- RiderUser
+    UserFactory ..&gt; User
+    UserDAO ..&gt; UserFactory
+    RideBooking o-- ShareRideRequest
+    BaseWebController &lt;|-- PageController
+    BaseWebController &lt;|-- AuthController
+    BaseWebController &lt;|-- UserController
+    BaseWebController &lt;|-- BikeController
+    BaseWebController &lt;|-- RideBookingController</pre>
+
+    <h2>10. User Interfaces</h2>
+    <ul>
+        <li>Home page</li>
+        <li>Login and registration pages</li>
+        <li>Admin user management page</li>
+        <li>Operator bike management page</li>
+        <li>Ride booking management page</li>
+    </ul>
+    <p class="muted">Screenshots can be inserted in this section before submission if required by the lecturer.</p>
+
+    <h2>11. Challenges Faced</h2>
+    <ul>
+        <li>Migrating the project from JSP/Servlet architecture to Spring Boot.</li>
+        <li>Converting JSP pages into Thymeleaf templates.</li>
+        <li>Preserving file-based data storage after the framework migration.</li>
+        <li>Adding a clearer polymorphism implementation for viva evaluation.</li>
+    </ul>
+    
+    <h2>12. Conclusion</h2>
+    <p>
+        The project successfully demonstrates object-oriented programming concepts, file handling, role-based web development,
+        and multiple CRUD operations using Java and Spring Boot. The final system provides a complete bike rental and ride-sharing
+        workflow while remaining aligned with the assignment requirements.
+    </p>
+</section>
+
+<section class="page">
+    <h2>13. Git Repository and Commit History</h2>
+    <p><strong>Repository URL:</strong> https://github.com/ashifahmed-924/OOP-bike-rental-system</p>
+    <p>
+        Version control for the project was managed using Git and GitHub. The commit history shows the progress of the application
+        from the initial implementation to the final Spring Boot and Thymeleaf migration.
+    </p>
+
+    <table>
+        <tr>
+            <th>Commit ID</th>
+            <th>Message</th>
+        </tr>
+        <tr>
+            <td><code>681ffa4</code></td>
+            <td>Convert app to Spring Boot and Thymeleaf</td>
+        </tr>
+        <tr>
+            <td><code>10d8d84</code></td>
+            <td>first commit</td>
+        </tr>
+    </table>
+
+    <h3>Git Log</h3>
+    <pre>681ffa4 Convert app to Spring Boot and Thymeleaf
+10d8d84 first commit</pre>
+</section>
+</body>
+</html>
