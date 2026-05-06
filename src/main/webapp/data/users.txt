@@ -7,3 +7,6 @@ testbook2:123:RIDER
 test0:123:OPERATOR
 test1:123:RIDER
 test2:123:RIDER
+iroshan:iroshan123:RIDER
+arshad:arshad123:OPERATOR
+Mufthi:Mufthi123:RIDER
