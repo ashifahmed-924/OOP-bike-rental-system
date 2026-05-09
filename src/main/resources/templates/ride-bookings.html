@@ -12,8 +12,23 @@
                 linear-gradient(180deg, #f6f8f5 0%, #eef4f1 100%);
         }
         .app-hero {
-            background: linear-gradient(135deg, #123c45 0%, #0f5f63 58%, #c86f31 100%);
-            box-shadow: 0 24px 52px rgba(18, 60, 69, 0.22);
+            background: linear-gradient(90deg, #0f766e 0%, #2f9f88 48%, #dff8ee 100%);
+            color: #ffffff;
+            border: 1px solid #0f766e;
+            box-shadow: 0 20px 44px rgba(15, 118, 110, 0.16);
+        }
+        .app-hero p {
+            color: rgba(255, 255, 255, 0.88);
+        }
+        .app-hero .btn-outline-light {
+            color: #0f5f63;
+            border-color: rgba(15, 95, 99, 0.38);
+            background: rgba(255, 255, 255, 0.32);
+        }
+        .app-hero .btn-outline-light:hover {
+            color: #fff;
+            background: #0f766e;
+            border-color: #0f766e;
         }
         .bike-card, .booking-table-card {
             border: 1px solid rgba(20, 83, 91, 0.12);
@@ -117,7 +132,7 @@
                             <div class="bike-meta mb-3">
                                 <div><strong>Type:</strong> <span th:text="${bike.bikeType}"></span></div>
                                 <div><strong>Station:</strong> <span th:text="${bike.station}"></span></div>
-                                <div><strong>Rate:</strong> $<span th:text="${bike.hourlyRate}"></span>/hour</div>
+                                <div><strong>Rate:</strong> LKR <span th:text="${bike.hourlyRate}"></span>/hour</div>
                                 <div><strong>Operator:</strong> <span th:text="${bike.operator}"></span></div>
                             </div>
 

@@ -104,7 +104,7 @@
                         <div class="card-body p-4">
                             <div class="meta-line mb-2"><strong>Type:</strong> <span th:text="${bike.bikeType}"></span></div>
                             <div class="meta-line mb-2"><strong>Station:</strong> <span th:text="${bike.station}"></span></div>
-                            <div class="meta-line mb-2"><strong>Rate:</strong> $<span th:text="${bike.hourlyRate}"></span>/hour</div>
+                            <div class="meta-line mb-2"><strong>Rate:</strong> LKR <span th:text="${bike.hourlyRate}"></span>/hour</div>
                             <div class="meta-line mb-3"><strong>Status:</strong> <span th:text="${bike.status}"></span></div>
                             <div class="d-flex gap-2 flex-wrap">
                                 <a th:href="@{/edit-bike(id=${bike.id})}" class="btn btn-warning btn-sm">Edit</a>
@@ -140,7 +140,7 @@
                         <div class="card-body p-4">
                             <div class="meta-line mb-2"><strong>Type:</strong> <span th:text="${bike.bikeType}"></span></div>
                             <div class="meta-line mb-2"><strong>Station:</strong> <span th:text="${bike.station}"></span></div>
-                            <div class="meta-line mb-2"><strong>Rate:</strong> $<span th:text="${bike.hourlyRate}"></span>/hour</div>
+                            <div class="meta-line mb-2"><strong>Rate:</strong> LKR <span th:text="${bike.hourlyRate}"></span>/hour</div>
                             <div class="meta-line mb-2"><strong>Operator:</strong> <span th:text="${bike.operator}"></span></div>
                             <div class="meta-line mb-4"><strong>Status:</strong> <span th:text="${bike.status}"></span></div>
                             <div class="d-flex gap-2 flex-wrap">

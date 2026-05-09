@@ -202,7 +202,7 @@
                 <div class="col-lg-7">
                     <h1>Find an available bike and book your next ride.</h1>
                     <p class="hero-copy">
-                        Browse the live fleet, compare stations and hourly pricing, then sign in to reserve a bike in a few clicks.
+                        Browse the live fleet, compare stations and hourly LKR pricing, then sign in to reserve a bike in a few clicks.
                     </p>
                     <div class="d-flex flex-wrap gap-3 mt-4">
                         <a href="#bike-fleet" class="btn btn-warning btn-lg">Explore Bikes</a>
@@ -273,7 +273,7 @@
                     <div class="card-body p-4">
                         <div class="bike-detail"><strong>Station:</strong> <span th:text="${bike.station}"></span></div>
                         <div class="bike-detail"><strong>Operator:</strong> <span th:text="${bike.operator}"></span></div>
-                        <div class="bike-detail"><strong>Rate:</strong> $<span th:text="${bike.hourlyRate}"></span>/hour</div>
+                        <div class="bike-detail"><strong>Rate:</strong> LKR <span th:text="${bike.hourlyRate}"></span>/hour</div>
 
                         <div class="d-grid mt-4" th:if="${session.currentUser == null}">
                             <a th:href="@{/login}" class="btn btn-primary"
