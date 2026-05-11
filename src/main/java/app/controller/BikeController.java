@@ -45,6 +45,7 @@ public class BikeController extends BaseWebController {
     public String addBike(@RequestParam String bikeName,
                           @RequestParam String bikeType,
                           @RequestParam String station,
+                          @RequestParam String phoneNumber,
                           @RequestParam double hourlyRate,
                           @RequestParam String status,
                           HttpSession session) throws IOException {
@@ -59,7 +60,7 @@ public class BikeController extends BaseWebController {
             return "redirect:/rideBookings";
         }
 
-        Bike bike = new Bike(0, bikeName, bikeType, station, hourlyRate, status, currentUser.getUsername());
+        Bike bike = new Bike(0, bikeName, bikeType, station, hourlyRate, status, currentUser.getUsername(), phoneNumber);
         new BikeDAO(dataPath()).addBike(bike);
         return "redirect:/bikes";
     }
@@ -69,6 +70,7 @@ public class BikeController extends BaseWebController {
                              @RequestParam String bikeName,
                              @RequestParam String bikeType,
                              @RequestParam String station,
+                             @RequestParam String phoneNumber,
                              @RequestParam double hourlyRate,
                              @RequestParam String status,
                              HttpSession session) throws IOException {
@@ -89,7 +91,7 @@ public class BikeController extends BaseWebController {
             return "redirect:/bikes";
         }
 
-        bikeDAO.updateBike(new Bike(id, bikeName, bikeType, station, hourlyRate, status, existingBike.getOperator()));
+        bikeDAO.updateBike(new Bike(id, bikeName, bikeType, station, hourlyRate, status, existingBike.getOperator(), phoneNumber));
         return "redirect:/bikes";
     }
 

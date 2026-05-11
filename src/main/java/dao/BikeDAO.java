@@ -34,8 +34,8 @@ public class BikeDAO {
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
 
-                String[] parts = line.split(":", 7);
-                if (parts.length == 7) {
+                String[] parts = line.split(":", 8);
+                if (parts.length >= 7) {
                     try {
                         bikes.add(new Bike(
                                 Integer.parseInt(parts[0]),
@@ -44,7 +44,8 @@ public class BikeDAO {
                                 parts[3],
                                 Double.parseDouble(parts[4]),
                                 parts[5],
-                                parts[6]
+                                parts[6],
+                                parts.length == 8 ? parts[7] : ""
                         ));
                     } catch (Exception ex) {
                         // Skip corrupted line

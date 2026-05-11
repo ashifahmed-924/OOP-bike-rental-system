@@ -4,6 +4,22 @@
     <title>Register - Bike Rental and Ride-Sharing Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link th:href="@{/assets/app-theme.css}" rel="stylesheet">
+    <style>
+        .role-help {
+            border: 1px solid rgba(15, 76, 129, 0.12);
+            border-radius: 16px;
+            padding: 1rem;
+            background: #f8fbff;
+        }
+        .role-help strong {
+            display: block;
+            color: #132033;
+        }
+        .role-help span {
+            color: #5a6b7d;
+            font-size: 0.92rem;
+        }
+    </style>
 </head>
 <body>
 <div class="container app-shell">
@@ -11,7 +27,7 @@
         <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
             <div>
                 <h2 class="page-title">Create an Account</h2>
-                <p class="mb-0">Join as a rider to book and share rides, or as an operator to manage the bike fleet.</p>
+                <p class="mb-0">Choose the account type that matches what you want to do in the bike rental and ride-sharing system.</p>
             </div>
             <a th:href="@{/}" class="btn btn-outline-light">Back to Home</a>
         </div>
@@ -36,11 +52,28 @@
                             <input type="password" name="password" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Choose Account Type</label>
+                            <label class="form-label">What do you want to use this app for?</label>
                             <select name="role" class="form-select" required>
-                                <option value="RIDER">Book a Ride</option>
-                                <option value="OPERATOR">Manage Bikes</option>
+                                <option value="OPERATOR">Bike Owner / Rental Provider - I want to rent out my bikes</option>
+                                <option value="RIDE_SHARER">Ride Sharer - I want to get a bike and share my ride</option>
+                                <option value="RIDE_BOOKER">Ride Booker / Passenger - I want to join or book a shared ride</option>
                             </select>
+                            <div class="form-text">This decides which dashboard opens after login.</div>
+                        </div>
+
+                        <div class="d-grid gap-2 mb-4">
+                            <div class="role-help">
+                                <strong>Bike Owner / Rental Provider</strong>
+                                <span>Add bikes, update prices and availability, and view bookings for your bikes.</span>
+                            </div>
+                            <div class="role-help">
+                                <strong>Ride Sharer</strong>
+                                <span>Rent an available bike, create a ride, and approve people who request to share it.</span>
+                            </div>
+                            <div class="role-help">
+                                <strong>Ride Booker / Passenger</strong>
+                                <span>Browse ongoing shared rides and send a request to join with your pickup, stop, and phone number.</span>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-success w-100">Register</button>
                     </form>

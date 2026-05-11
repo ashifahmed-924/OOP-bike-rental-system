@@ -37,10 +37,7 @@ public class AuthController extends BaseWebController {
                            @RequestParam String password,
                            @RequestParam(required = false) String role,
                            Model model) throws IOException {
-        String effectiveRole = role;
-        if (effectiveRole == null || effectiveRole.trim().isEmpty() || "ADMIN".equalsIgnoreCase(effectiveRole)) {
-            effectiveRole = "RIDER";
-        }
+        String effectiveRole = normalizePublicRole(role);
 
         UserDAO userDAO = new UserDAO(dataPath());
         boolean created = userDAO.registerUser(UserFactory.createUser(username, password, effectiveRole));
@@ -51,6 +48,19 @@ public class AuthController extends BaseWebController {
 
         model.addAttribute("success", "Registration successful! Please login.");
         return "login";
+    }
+
+    private String normalizePublicRole(String role) {
+        if ("OPERATOR".equalsIgnoreCase(role)) {
+            return "OPERATOR";
+        }
+        if ("RIDE_BOOKER".equalsIgnoreCase(role)) {
+            return "RIDE_BOOKER";
+        }
+        if ("RIDE_SHARER".equalsIgnoreCase(role)) {
+            return "RIDE_SHARER";
+        }
+        return "RIDE_SHARER";
     }
 
     @GetMapping("/logout")

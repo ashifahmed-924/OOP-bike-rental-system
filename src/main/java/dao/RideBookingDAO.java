@@ -47,9 +47,22 @@ public class RideBookingDAO {
                     continue;
                 }
 
-                String[] parts = line.split(":", 9);
+                String[] parts = line.split(":", 12);
                 if (parts.length >= 8) {
                     try {
+                        List<ShareRideRequest> shareRequests;
+                        String rentalPickupTime = "";
+                        String rentalReturnTime = "";
+                        String renterPhoneNumber = "";
+                        if (parts.length >= 12) {
+                            rentalPickupTime = RideBooking.decodeField(parts[8]);
+                            rentalReturnTime = RideBooking.decodeField(parts[9]);
+                            renterPhoneNumber = RideBooking.decodeField(parts[10]);
+                            shareRequests = ShareRideRequest.parseList(parts[11]);
+                        } else {
+                            shareRequests = parts.length == 9 ? ShareRideRequest.parseList(parts[8]) : new ArrayList<ShareRideRequest>();
+                        }
+
                         bookings.add(new RideBooking(
                                 Integer.parseInt(parts[0]),
                                 Integer.parseInt(parts[1]),
@@ -59,7 +72,10 @@ public class RideBookingDAO {
                                 parts[5],
                                 parts[6],
                                 parts[7],
-                                parts.length == 9 ? ShareRideRequest.parseList(parts[8]) : new ArrayList<ShareRideRequest>()
+                                rentalPickupTime,
+                                rentalReturnTime,
+                                renterPhoneNumber,
+                                shareRequests
                         ));
                     } catch (Exception ex) {
                         // Skip corrupted line

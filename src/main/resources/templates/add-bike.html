@@ -11,7 +11,7 @@
     <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
       <div>
         <h2 class="page-title">Add a New Bike</h2>
-        <p class="mb-0">Create a new fleet item with station, pricing, and current availability.</p>
+        <p class="mb-0">Create a new fleet item with location, contact number, pricing, and current availability.</p>
       </div>
       <a th:href="@{/bikes}" class="btn btn-outline-light">Back to Bikes</a>
     </div>
@@ -33,8 +33,12 @@
               <input type="text" name="bikeType" class="form-control" required>
             </div>
             <div class="mb-3">
-              <label class="form-label">Station</label>
-              <input type="text" name="station" class="form-control" required>
+              <label class="form-label">Location</label>
+              <input type="text" name="station" class="form-control" placeholder="Bike pickup location" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" name="phoneNumber" class="form-control" placeholder="Contact number for renters" required>
             </div>
             <div class="mb-3">
               <label class="form-label">Hourly Rate (LKR)</label>

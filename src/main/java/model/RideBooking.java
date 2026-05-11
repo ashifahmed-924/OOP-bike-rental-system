@@ -2,6 +2,9 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 public class RideBooking {
     private int id;
@@ -12,6 +15,9 @@ public class RideBooking {
     private String pickupPoint;
     private String dropPoint;
     private String status;
+    private String rentalPickupTime;
+    private String rentalReturnTime;
+    private String renterPhoneNumber;
     private List<ShareRideRequest> shareRequests;
 
     public RideBooking() {
@@ -23,6 +29,12 @@ public class RideBooking {
     }
 
     public RideBooking(int id, int bikeId, String bikeName, String username, int durationHours, String pickupPoint, String dropPoint, String status, List<ShareRideRequest> shareRequests) {
+        this(id, bikeId, bikeName, username, durationHours, pickupPoint, dropPoint, status, "", "", "", shareRequests);
+    }
+
+    public RideBooking(int id, int bikeId, String bikeName, String username, int durationHours, String pickupPoint,
+                       String dropPoint, String status, String rentalPickupTime, String rentalReturnTime,
+                       String renterPhoneNumber, List<ShareRideRequest> shareRequests) {
         this.id = id;
         this.bikeId = bikeId;
         this.bikeName = bikeName;
@@ -31,6 +43,9 @@ public class RideBooking {
         this.pickupPoint = pickupPoint;
         this.dropPoint = dropPoint;
         this.status = status;
+        this.rentalPickupTime = rentalPickupTime;
+        this.rentalReturnTime = rentalReturnTime;
+        this.renterPhoneNumber = renterPhoneNumber;
         this.shareRequests = shareRequests == null ? new ArrayList<ShareRideRequest>() : new ArrayList<>(shareRequests);
     }
 
@@ -57,6 +72,34 @@ public class RideBooking {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getRentalPickupTime() { return rentalPickupTime; }
+    public void setRentalPickupTime(String rentalPickupTime) { this.rentalPickupTime = rentalPickupTime; }
+
+    public String getRentalReturnTime() { return rentalReturnTime; }
+    public void setRentalReturnTime(String rentalReturnTime) { this.rentalReturnTime = rentalReturnTime; }
+
+    public String getRenterPhoneNumber() { return renterPhoneNumber; }
+    public void setRenterPhoneNumber(String renterPhoneNumber) { this.renterPhoneNumber = renterPhoneNumber; }
+
+    public String getStatusDisplayName() {
+        if ("PENDING_OWNER_APPROVAL".equalsIgnoreCase(status)) {
+            return "Waiting for Owner Approval";
+        }
+        if ("OPEN_TO_SHARE".equalsIgnoreCase(status)) {
+            return "Open to Share";
+        }
+        if ("CONFIRMED".equalsIgnoreCase(status)) {
+            return "Confirmed";
+        }
+        if ("COMPLETED".equalsIgnoreCase(status)) {
+            return "Completed";
+        }
+        if ("CANCELLED".equalsIgnoreCase(status)) {
+            return "Cancelled";
+        }
+        return "Requested";
+    }
 
     public List<ShareRideRequest> getShareRequests() { return new ArrayList<>(shareRequests); }
     public void setShareRequests(List<ShareRideRequest> shareRequests) {
@@ -101,17 +144,22 @@ public class RideBooking {
         return !"COMPLETED".equalsIgnoreCase(status) && !"CANCELLED".equalsIgnoreCase(status);
     }
 
+    public boolean isShareable() {
+        return "OPEN_TO_SHARE".equalsIgnoreCase(status) || "CONFIRMED".equalsIgnoreCase(status);
+    }
+
     public void addShareRequest(ShareRideRequest shareRequest) {
         if (shareRequest != null) {
             shareRequests.add(shareRequest);
         }
     }
 
-    public boolean updateShareRequestStatus(String requesterUsername, String nextStatus) {
+    public boolean updateShareRequestStatus(String requesterUsername, String nextStatus, String passengerPickupTime) {
         for (ShareRideRequest shareRequest : shareRequests) {
             if (shareRequest.getRequesterUsername().equalsIgnoreCase(requesterUsername)
                     && "PENDING".equalsIgnoreCase(shareRequest.getStatus())) {
                 shareRequest.setStatus(nextStatus);
+                shareRequest.setPassengerPickupTime(passengerPickupTime);
                 return true;
             }
         }
@@ -130,6 +178,28 @@ public class RideBooking {
 
     @Override
     public String toString() {
-        return id + ":" + bikeId + ":" + bikeName + ":" + username + ":" + durationHours + ":" + pickupPoint + ":" + dropPoint + ":" + status + ":" + ShareRideRequest.serializeList(shareRequests);
+        return id + ":" + bikeId + ":" + bikeName + ":" + username + ":" + durationHours + ":" + pickupPoint + ":"
+                + dropPoint + ":" + status + ":" + encode(rentalPickupTime) + ":" + encode(rentalReturnTime) + ":"
+                + encode(renterPhoneNumber) + ":" + ShareRideRequest.serializeList(shareRequests);
+    }
+
+    public static String decodeField(String value) {
+        return decode(value);
+    }
+
+    private static String encode(String value) {
+        try {
+            return URLEncoder.encode(value == null ? "" : value, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            return "";
+        }
+    }
+
+    private static String decode(String value) {
+        try {
+            return URLDecoder.decode(value == null ? "" : value, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            return "";
+        }
     }
 }

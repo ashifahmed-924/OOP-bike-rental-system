@@ -96,9 +96,10 @@
 <div class="container app-shell">
     <div class="app-hero d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <div>
-            <h2 class="page-title" th:text="${#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')} ? 'Ride Booking Overview' : 'My Rides'"></h2>
+            <h2 class="page-title"
+                th:text="${#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')} ? 'Ride Booking Overview' : (${#strings.equalsIgnoreCase(session.currentUser.role, 'RIDE_BOOKER')} ? 'Shared Rides' : 'My Rides')"></h2>
             <p class="mb-0"
-               th:text="${#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')} ? 'See booking activity only for bikes you added.' : 'Book a bike, review ongoing rides, and manage ride sharing.'"></p>
+               th:text="${#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')} ? 'See booking activity only for bikes you added.' : (${#strings.equalsIgnoreCase(session.currentUser.role, 'RIDE_BOOKER')} ? 'Browse ongoing shared rides and request to join.' : 'Book a bike, review ongoing rides, and manage ride sharing.')"></p>
         </div>
         <div class="d-flex gap-2 flex-wrap">
             <a th:if="${#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')}" th:href="@{/bikes}" class="btn btn-outline-light">Manage Bikes</a>
@@ -106,11 +107,83 @@
         </div>
     </div>
 
-    <th:block th:if="${!#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')}">
+    <th:block th:if="${#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')}">
+        <div class="card section-card app-card mb-4">
+            <div class="section-header">
+                <h5 class="mb-1">Rental Requests Waiting for Your Approval</h5>
+                <p class="mb-0 opacity-75">Accept only if the renter phone, pickup time, return time, and route are suitable.</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="app-empty" th:if="${#lists.isEmpty(pendingRentalRequests)}">
+                    No bike rental requests are waiting for approval.
+                </div>
+                <div class="row g-4">
+                    <div class="col-lg-6" th:each="booking : ${pendingRentalRequests}">
+                        <div class="request-box h-100">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                                <div>
+                                    <h5 class="mb-1" th:text="${booking.bikeName}"></h5>
+                                    <div class="small text-muted" th:text="'Requested by ' + ${booking.username}"></div>
+                                </div>
+                                <span class="app-chip">Waiting</span>
+                            </div>
+                            <div class="bike-meta mb-3">
+                                <div><strong>Renter phone:</strong> <span th:text="${booking.renterPhoneNumber}"></span></div>
+                                <div><strong>Get bike at:</strong> <span th:text="${booking.rentalPickupTime}"></span></div>
+                                <div><strong>Return bike at:</strong> <span th:text="${booking.rentalReturnTime}"></span></div>
+                                <div><strong>Route:</strong> <span th:text="${booking.pickupPoint}"></span> to <span th:text="${booking.dropPoint}"></span></div>
+                                <div><strong>Hours:</strong> <span th:text="${booking.durationHours}"></span></div>
+                            </div>
+                            <form th:action="@{/respondBikeRentalRequest}" method="post" class="d-flex gap-2 flex-wrap">
+                                <input type="hidden" name="bookingId" th:value="${booking.id}">
+                                <button type="submit" name="decision" value="accept" class="btn btn-success btn-sm">Accept Rental</button>
+                                <button type="submit" name="decision" value="decline" class="btn btn-outline-danger btn-sm">Decline</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <th:block th:if="${canBookBikes}">
+        <div class="card section-card app-card mb-4" th:if="${!#lists.isEmpty(pendingRentalRequests)}">
+            <div class="section-header">
+                <h5 class="mb-1">Waiting for Bike Owner Approval</h5>
+                <p class="mb-0 opacity-75">Your route will become visible to passengers only after the bike owner accepts your rental request.</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-lg-6" th:each="booking : ${pendingRentalRequests}">
+                        <div class="request-box h-100">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                                <div>
+                                    <h5 class="mb-1" th:text="${booking.bikeName}"></h5>
+                                    <div class="small text-muted">Waiting for the bike owner to approve this rental request.</div>
+                                </div>
+                                <span class="app-chip">Pending</span>
+                            </div>
+                            <div class="bike-meta mb-3">
+                                <div><strong>Your phone:</strong> <span th:text="${booking.renterPhoneNumber}"></span></div>
+                                <div><strong>Get bike at:</strong> <span th:text="${booking.rentalPickupTime}"></span></div>
+                                <div><strong>Return bike at:</strong> <span th:text="${booking.rentalReturnTime}"></span></div>
+                                <div><strong>Route:</strong> <span th:text="${booking.pickupPoint}"></span> to <span th:text="${booking.dropPoint}"></span></div>
+                            </div>
+                            <a th:href="@{/deleteRideBooking(id=${booking.id})}"
+                               class="btn btn-outline-danger btn-sm"
+                               onclick="return confirm('Cancel this rental request?')">Cancel Request</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <th:block th:if="${canBookBikes}">
         <div class="mb-4">
             <div class="mb-3">
                 <h4 class="mb-1">Available Bikes</h4>
-                <p class="app-muted mb-0">Browse bikes and reserve one directly when it is still open for booking.</p>
+                <p class="app-muted mb-0">Send a rental request with your route, contact number, pickup time, and return time. Passengers can join only after the bike owner accepts.</p>
             </div>
 
             <div class="row g-4">
@@ -131,7 +204,8 @@
                         <div class="card-body p-4">
                             <div class="bike-meta mb-3">
                                 <div><strong>Type:</strong> <span th:text="${bike.bikeType}"></span></div>
-                                <div><strong>Station:</strong> <span th:text="${bike.station}"></span></div>
+                                <div><strong>Location:</strong> <span th:text="${bike.station}"></span></div>
+                                <div><strong>Phone:</strong> <span th:text="${bike.phoneNumber}"></span></div>
                                 <div><strong>Rate:</strong> LKR <span th:text="${bike.hourlyRate}"></span>/hour</div>
                                 <div><strong>Operator:</strong> <span th:text="${bike.operator}"></span></div>
                             </div>
@@ -144,15 +218,27 @@
                                         <input type="number" name="durationHours" class="form-control" min="1" value="1" required>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label mb-1">Pickup</label>
-                                        <input type="text" name="pickupPoint" class="form-control" placeholder="Pickup point" required>
+                                        <label class="form-label mb-1">From</label>
+                                        <input type="text" name="pickupPoint" class="form-control" placeholder="Starting location" required>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label mb-1">Drop-off</label>
-                                        <input type="text" name="dropPoint" class="form-control" placeholder="Drop-off point" required>
+                                        <label class="form-label mb-1">To</label>
+                                        <input type="text" name="dropPoint" class="form-control" placeholder="Destination" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label mb-1">Get bike at</label>
+                                        <input type="time" name="rentalPickupTime" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label mb-1">Return bike at</label>
+                                        <input type="time" name="rentalReturnTime" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label mb-1">Your phone</label>
+                                        <input type="tel" name="renterPhoneNumber" class="form-control" placeholder="Contact number" required>
                                     </div>
                                     <div class="col-12">
-                                        <button type="submit" class="btn btn-success w-100">Book This Ride</button>
+                                        <button type="submit" class="btn btn-success w-100">Request Bike and Share Route</button>
                                     </div>
                                 </form>
                             </th:block>
@@ -165,11 +251,13 @@
                 </div>
             </div>
         </div>
+    </th:block>
 
+    <th:block th:if="${canJoinSharedRides}">
         <div class="card section-card app-card mb-4">
             <div class="section-header">
                 <h5 class="mb-1">Ongoing Rides You Can Join</h5>
-                <p class="mb-0 opacity-75">See active bookings from other riders and request to share the ride with your own pickup and stop.</p>
+                <p class="mb-0 opacity-75">Check the ride sharer's route. If it matches your journey, request to join with your pickup, stop, and phone number.</p>
             </div>
             <div class="card-body p-4">
                 <div class="row g-4">
@@ -179,8 +267,8 @@
                     <div class="col-lg-6" th:each="booking : ${shareableBookings}"
                          th:with="myShareRequest=${booking.getShareRequestByRequester(session.currentUser.username)},
                                   alreadyRequested=${myShareRequest != null},
-                                  effectiveRideStatus=${#strings.equalsIgnoreCase(booking.status, 'REQUESTED') and !#lists.isEmpty(booking.acceptedShareRequests) ? 'CONFIRMED' : booking.status},
-                                  rideBadgeText=${alreadyRequested ? 'SHARE ' + myShareRequest.status : booking.status},
+                                  effectiveRideStatus=${#strings.equalsIgnoreCase(booking.status, 'OPEN_TO_SHARE') and !#lists.isEmpty(booking.acceptedShareRequests) ? 'Confirmed' : booking.statusDisplayName},
+                                  rideBadgeText=${alreadyRequested ? 'SHARE ' + myShareRequest.status : booking.statusDisplayName},
                                   rideBadgeClass=${alreadyRequested ? (#strings.equalsIgnoreCase(myShareRequest.status, 'ACCEPTED') ? 'bg-success' : (#strings.equalsIgnoreCase(myShareRequest.status, 'DECLINED') ? 'bg-danger' : 'bg-info text-dark')) : 'bg-light text-dark'}">
                         <div class="card bike-card h-100">
                             <div class="bike-banner">
@@ -194,10 +282,12 @@
                             </div>
                             <div class="card-body p-4">
                                 <div class="bike-meta mb-3">
-                                    <div><strong>Main ride status:</strong> <span th:text="${effectiveRideStatus}"></span></div>
+                                    <div><strong>Ride status:</strong> <span th:text="${effectiveRideStatus}"></span></div>
                                     <div><strong>Hours:</strong> <span th:text="${booking.durationHours}"></span></div>
-                                    <div><strong>Main pickup:</strong> <span th:text="${booking.pickupPoint}"></span></div>
-                                    <div><strong>Main drop-off:</strong> <span th:text="${booking.dropPoint}"></span></div>
+                                    <div><strong>Bike pickup time:</strong> <span th:text="${booking.rentalPickupTime}"></span></div>
+                                    <div><strong>Bike return time:</strong> <span th:text="${booking.rentalReturnTime}"></span></div>
+                                    <div><strong>Route from:</strong> <span th:text="${booking.pickupPoint}"></span></div>
+                                    <div><strong>Route to:</strong> <span th:text="${booking.dropPoint}"></span></div>
                                     <div><strong>Accepted riders:</strong> <span th:text="${#lists.size(booking.acceptedShareRequests)}"></span></div>
                                 </div>
 
@@ -208,6 +298,12 @@
                                             <strong th:text="${acceptedRequest.requesterUsername}"></strong>
                                             <div class="small text-muted">
                                                 Pickup: <span th:text="${acceptedRequest.pickupPoint}"></span> | Stop: <span th:text="${acceptedRequest.stopPoint}"></span>
+                                                <span th:if="${acceptedRequest.passengerPhoneNumber != null and !#strings.isEmpty(acceptedRequest.passengerPhoneNumber)}">
+                                                    | Phone: <span th:text="${acceptedRequest.passengerPhoneNumber}"></span>
+                                                </span>
+                                                <span th:if="${acceptedRequest.passengerPickupTime != null and !#strings.isEmpty(acceptedRequest.passengerPickupTime)}">
+                                                    | Pickup time: <span th:text="${acceptedRequest.passengerPickupTime}"></span>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -218,6 +314,12 @@
                                      th:classappend="${#strings.equalsIgnoreCase(myShareRequest.status, 'ACCEPTED')} ? 'alert-success' : (${#strings.equalsIgnoreCase(myShareRequest.status, 'DECLINED')} ? 'alert-danger' : 'alert-info')">
                                     Share request status: <strong th:text="${myShareRequest.status}"></strong><br>
                                     Your pickup: <span th:text="${myShareRequest.pickupPoint}"></span> | Your stop: <span th:text="${myShareRequest.stopPoint}"></span>
+                                    <span th:if="${myShareRequest.passengerPhoneNumber != null and !#strings.isEmpty(myShareRequest.passengerPhoneNumber)}">
+                                        <br>Your phone: <span th:text="${myShareRequest.passengerPhoneNumber}"></span>
+                                    </span>
+                                    <span th:if="${myShareRequest.passengerPickupTime != null and !#strings.isEmpty(myShareRequest.passengerPickupTime)}">
+                                        <br>Ride sharer pickup time: <span th:text="${myShareRequest.passengerPickupTime}"></span>
+                                    </span>
                                 </div>
 
                                 <form th:if="${!alreadyRequested}" th:action="@{/requestShareRide}" method="post" class="row g-2">
@@ -231,7 +333,11 @@
                                         <input type="text" name="shareStopPoint" class="form-control" placeholder="Your stop point" required>
                                     </div>
                                     <div class="col-12">
-                                        <button type="submit" class="btn btn-primary w-100">Share Ride</button>
+                                        <label class="form-label mb-1">Your phone</label>
+                                        <input type="tel" name="sharePhoneNumber" class="form-control" placeholder="Contact number" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary w-100">Request to Join Ride</button>
                                     </div>
                                 </form>
                             </div>
@@ -245,7 +351,7 @@
     <div class="card booking-table-card app-card">
         <div class="card-header app-gradient-primary">
             <h5 class="mb-0"
-                th:text="${#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')} ? 'Bookings For Your Bikes' : 'Your Ride Bookings'"></h5>
+                th:text="${#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')} ? 'Bookings For Your Bikes' : (${#strings.equalsIgnoreCase(session.currentUser.role, 'RIDE_BOOKER')} ? 'Your Shared Ride Requests' : 'Your Ride Bookings')"></h5>
         </div>
         <div class="card-body p-4">
             <div class="table-responsive">
@@ -257,56 +363,118 @@
                         <th>Bike</th>
                         <th>User</th>
                         <th>Hours</th>
-                        <th>Pickup</th>
-                        <th>Drop-off</th>
+                        <th>Get Bike</th>
+                        <th>Return Bike</th>
+                        <th>Renter Phone</th>
+                        <th>From</th>
+                        <th>To</th>
                         <th>Status</th>
-                        <th th:if="${!#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')}">Ride Share</th>
-                        <th th:if="${!#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')}">Actions</th>
+                        <th th:if="${canJoinSharedRides or canManageShareRequests}">Ride Share</th>
+                        <th th:if="${#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')}">Owner Approval</th>
+                        <th th:if="${canBookBikes}">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:if="${#lists.isEmpty(rideBookings)}">
-                        <td th:colspan="${#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')} ? 8 : 10" class="text-center">
+                        <td th:colspan="${#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')} ? 12 : (${canBookBikes} ? 13 : 12)" class="text-center">
                             <div class="app-empty">No ride bookings found.</div>
                         </td>
                     </tr>
                     <tr th:each="booking : ${rideBookings}"
-                        th:with="effectiveBookingStatus=${#strings.equalsIgnoreCase(booking.status, 'REQUESTED') and !#lists.isEmpty(booking.acceptedShareRequests) ? 'CONFIRMED' : booking.status}">
+                        th:with="effectiveBookingStatus=${#strings.equalsIgnoreCase(booking.status, 'OPEN_TO_SHARE') and !#lists.isEmpty(booking.acceptedShareRequests) ? 'Confirmed' : booking.statusDisplayName}">
                         <td th:text="${booking.id}"></td>
                         <td th:text="${booking.bikeId}"></td>
                         <td th:text="${booking.bikeName}"></td>
                         <td th:text="${booking.username}"></td>
                         <td th:text="${booking.durationHours}"></td>
+                        <td th:text="${booking.rentalPickupTime}"></td>
+                        <td th:text="${booking.rentalReturnTime}"></td>
+                        <td th:text="${booking.renterPhoneNumber}"></td>
                         <td th:text="${booking.pickupPoint}"></td>
                         <td th:text="${booking.dropPoint}"></td>
                         <td><span class="app-chip" th:text="${effectiveBookingStatus}"></span></td>
-                        <td th:if="${!#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')}" style="min-width: 280px;">
-                            <div class="small text-muted mb-2">
-                                Pending: <span th:text="${#lists.size(booking.pendingShareRequests)}"></span> |
-                                Joined: <span th:text="${#lists.size(booking.acceptedShareRequests)}"></span>
-                            </div>
-                            <div class="request-box mb-2" th:each="shareRequest : ${booking.pendingShareRequests}">
-                                <div class="fw-semibold" th:text="${shareRequest.requesterUsername}"></div>
-                                <div class="small text-muted mb-2">
-                                    Pickup: <span th:text="${shareRequest.pickupPoint}"></span> | Stop: <span th:text="${shareRequest.stopPoint}"></span>
+                        <td th:if="${canJoinSharedRides or canManageShareRequests}" style="min-width: 280px;">
+                            <div th:if="${#strings.equalsIgnoreCase(session.currentUser.role, 'RIDE_BOOKER')}"
+                                 th:with="myShareRequest=${booking.getShareRequestByRequester(session.currentUser.username)}">
+                                <div th:if="${myShareRequest != null}"
+                                     class="alert mb-0"
+                                     th:classappend="${#strings.equalsIgnoreCase(myShareRequest.status, 'ACCEPTED')} ? 'alert-success' : (${#strings.equalsIgnoreCase(myShareRequest.status, 'DECLINED')} ? 'alert-danger' : 'alert-info')">
+                                    Request status: <strong th:text="${myShareRequest.status}"></strong><br>
+                                    Your pickup: <span th:text="${myShareRequest.pickupPoint}"></span> | Your stop: <span th:text="${myShareRequest.stopPoint}"></span>
+                                    <span th:if="${myShareRequest.passengerPhoneNumber != null and !#strings.isEmpty(myShareRequest.passengerPhoneNumber)}">
+                                        <br>Your phone: <span th:text="${myShareRequest.passengerPhoneNumber}"></span>
+                                    </span>
+                                    <span th:if="${myShareRequest.passengerPickupTime != null and !#strings.isEmpty(myShareRequest.passengerPickupTime)}">
+                                        <br>Ride sharer pickup time: <span th:text="${myShareRequest.passengerPickupTime}"></span>
+                                    </span>
                                 </div>
-                                <form th:action="@{/respondShareRideRequest}" method="post" class="d-flex gap-2">
+                            </div>
+                            <div th:if="${canManageShareRequests}">
+                                <div th:if="${#strings.equalsIgnoreCase(booking.status, 'PENDING_OWNER_APPROVAL')}" class="alert alert-info mb-2">
+                                    Waiting for the bike owner to approve this rental request.
+                                </div>
+                                <th:block th:if="${!#strings.equalsIgnoreCase(booking.status, 'PENDING_OWNER_APPROVAL')}">
+                                <div class="small text-muted mb-2">
+                                    Pending: <span th:text="${#lists.size(booking.pendingShareRequests)}"></span> |
+                                    Joined: <span th:text="${#lists.size(booking.acceptedShareRequests)}"></span>
+                                </div>
+                                <div class="request-box mb-2" th:each="shareRequest : ${booking.pendingShareRequests}">
+                                    <div class="fw-semibold" th:text="${shareRequest.requesterUsername}"></div>
+                                    <div class="small text-muted mb-2">
+                                        Pickup: <span th:text="${shareRequest.pickupPoint}"></span> | Stop: <span th:text="${shareRequest.stopPoint}"></span>
+                                        <span th:if="${shareRequest.passengerPhoneNumber != null and !#strings.isEmpty(shareRequest.passengerPhoneNumber)}">
+                                            | Phone: <span th:text="${shareRequest.passengerPhoneNumber}"></span>
+                                        </span>
+                                    </div>
+                                    <form th:action="@{/respondShareRideRequest}" method="post" class="row g-2 mb-2">
+                                        <input type="hidden" name="bookingId" th:value="${booking.id}">
+                                        <input type="hidden" name="requesterUsername" th:value="${shareRequest.requesterUsername}">
+                                        <input type="hidden" name="decision" value="accept">
+                                        <div class="col-md-7">
+                                            <input type="time" name="passengerPickupTime" class="form-control form-control-sm" required>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <button type="submit" class="btn btn-success btn-sm w-100">Accept</button>
+                                        </div>
+                                    </form>
+                                    <form th:action="@{/respondShareRideRequest}" method="post">
+                                        <input type="hidden" name="bookingId" th:value="${booking.id}">
+                                        <input type="hidden" name="requesterUsername" th:value="${shareRequest.requesterUsername}">
+                                        <button type="submit" name="decision" value="decline" class="btn btn-outline-danger btn-sm">Decline</button>
+                                    </form>
+                                </div>
+                                <div class="request-box mb-2" th:each="shareRequest : ${booking.acceptedShareRequests}">
+                                    <div class="fw-semibold" th:text="${shareRequest.requesterUsername}"></div>
+                                    <div class="small text-muted">
+                                        Joined from <span th:text="${shareRequest.pickupPoint}"></span> to <span th:text="${shareRequest.stopPoint}"></span>
+                                        <span th:if="${shareRequest.passengerPhoneNumber != null and !#strings.isEmpty(shareRequest.passengerPhoneNumber)}">
+                                            | Phone: <span th:text="${shareRequest.passengerPhoneNumber}"></span>
+                                        </span>
+                                        <span th:if="${shareRequest.passengerPickupTime != null and !#strings.isEmpty(shareRequest.passengerPickupTime)}">
+                                            | Pickup time: <span th:text="${shareRequest.passengerPickupTime}"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <span th:if="${#lists.isEmpty(booking.pendingShareRequests) and #lists.isEmpty(booking.acceptedShareRequests)}"
+                                      class="app-muted small">No share requests yet.</span>
+                                </th:block>
+                            </div>
+                        </td>
+                        <td th:if="${#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')}" style="min-width: 220px;">
+                            <div th:if="${#strings.equalsIgnoreCase(booking.status, 'PENDING_OWNER_APPROVAL')}">
+                                <div class="small text-muted mb-2">
+                                    Review the renter's pickup time, return time, phone, and route before accepting.
+                                </div>
+                                <form th:action="@{/respondBikeRentalRequest}" method="post" class="d-flex gap-2 flex-wrap">
                                     <input type="hidden" name="bookingId" th:value="${booking.id}">
-                                    <input type="hidden" name="requesterUsername" th:value="${shareRequest.requesterUsername}">
-                                    <button type="submit" name="decision" value="accept" class="btn btn-success btn-sm">Accept</button>
+                                    <button type="submit" name="decision" value="accept" class="btn btn-success btn-sm">Accept Rental</button>
                                     <button type="submit" name="decision" value="decline" class="btn btn-outline-danger btn-sm">Decline</button>
                                 </form>
                             </div>
-                            <div class="request-box mb-2" th:each="shareRequest : ${booking.acceptedShareRequests}">
-                                <div class="fw-semibold" th:text="${shareRequest.requesterUsername}"></div>
-                                <div class="small text-muted">
-                                    Joined from <span th:text="${shareRequest.pickupPoint}"></span> to <span th:text="${shareRequest.stopPoint}"></span>
-                                </div>
-                            </div>
-                            <span th:if="${#lists.isEmpty(booking.pendingShareRequests) and #lists.isEmpty(booking.acceptedShareRequests)}"
-                                  class="app-muted small">No share requests yet.</span>
+                            <span th:if="${!#strings.equalsIgnoreCase(booking.status, 'PENDING_OWNER_APPROVAL')}"
+                                  class="app-muted small" th:text="${booking.statusDisplayName}"></span>
                         </td>
-                        <td th:if="${!#strings.equalsIgnoreCase(session.currentUser.role, 'OPERATOR')}">
+                        <td th:if="${canBookBikes}">
                             <a th:href="@{/edit-ride-booking(id=${booking.id})}" class="btn btn-warning btn-sm">Edit</a>
                             <a th:href="@{/deleteRideBooking(id=${booking.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Delete this ride booking?')">Delete</a>
                         </td>

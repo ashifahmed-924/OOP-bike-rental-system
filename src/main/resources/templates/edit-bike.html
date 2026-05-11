@@ -35,8 +35,12 @@
                             <input type="text" name="bikeType" th:value="${bike.bikeType}" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Station</label>
+                            <label class="form-label">Location</label>
                             <input type="text" name="station" th:value="${bike.station}" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" name="phoneNumber" th:value="${bike.phoneNumber}" class="form-control" placeholder="Contact number for renters" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Hourly Rate (LKR)</label>
