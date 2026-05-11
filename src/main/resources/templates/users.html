@@ -40,8 +40,9 @@
                         <div class="mb-3">
                             <label class="form-label">Role</label>
                             <select name="role" class="form-select" required>
-                                <option value="RIDER">Rider</option>
-                                <option value="OPERATOR">Operator</option>
+                                <option value="OPERATOR">Bike Owner / Rental Provider</option>
+                                <option value="RIDE_SHARER">Ride Sharer</option>
+                                <option value="RIDE_BOOKER">Ride Booker / Passenger</option>
                                 <option value="ADMIN">Admin</option>
                             </select>
                         </div>
@@ -80,7 +81,7 @@
                             <tr th:each="user : ${users}">
                                 <td th:text="${user.username}"></td>
                                 <td th:text="${user.password}"></td>
-                                <td><span class="app-chip" th:text="${user.role}"></span></td>
+                                <td><span class="app-chip" th:text="${user.roleDisplayName}"></span></td>
                                 <td>
                                     <a th:href="@{/edit-user(username=${user.username})}" class="btn btn-warning btn-sm">Edit</a>
                                     <a th:if="${session.currentUser.username != user.username}"

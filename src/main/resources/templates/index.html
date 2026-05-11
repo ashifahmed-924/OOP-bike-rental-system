@@ -202,7 +202,7 @@
                 <div class="col-lg-7">
                     <h1>Find an available bike and book your next ride.</h1>
                     <p class="hero-copy">
-                        Browse the live fleet, compare stations and hourly LKR pricing, then sign in to reserve a bike in a few clicks.
+                        Browse the live fleet, compare locations and hourly LKR pricing, then sign in to reserve a bike in a few clicks.
                     </p>
                     <div class="d-flex flex-wrap gap-3 mt-4">
                         <a href="#bike-fleet" class="btn btn-warning btn-lg">Explore Bikes</a>
@@ -230,7 +230,7 @@
                     <span>Total fleet</span>
                 </div>
                 <div class="stat-card">
-                    <strong th:text="${session.currentUser == null ? 'Guest' : session.currentUser.role}"></strong>
+                    <strong th:text="${session.currentUser == null ? 'Guest' : session.currentUser.roleDisplayName}"></strong>
                     <span>Current access</span>
                 </div>
             </div>
@@ -245,7 +245,7 @@
                 <h2 class="mb-1">Bike Fleet</h2>
                 <p class="text-secondary mb-0">Every bike is listed here. Only bikes marked available can be booked immediately.</p>
             </div>
-            <a th:if="${session.currentUser == null}" th:href="@{/register}" class="btn btn-outline-primary">Register as Rider</a>
+            <a th:if="${session.currentUser == null}" th:href="@{/register}" class="btn btn-outline-primary">Choose Account Type</a>
             <a th:if="${session.currentUser != null}" th:href="${dashboardLink}" class="btn btn-outline-primary">Continue to Booking</a>
         </div>
 
@@ -271,7 +271,8 @@
                         </div>
                     </div>
                     <div class="card-body p-4">
-                        <div class="bike-detail"><strong>Station:</strong> <span th:text="${bike.station}"></span></div>
+                        <div class="bike-detail"><strong>Location:</strong> <span th:text="${bike.station}"></span></div>
+                        <div class="bike-detail"><strong>Phone:</strong> <span th:text="${bike.phoneNumber}"></span></div>
                         <div class="bike-detail"><strong>Operator:</strong> <span th:text="${bike.operator}"></span></div>
                         <div class="bike-detail"><strong>Rate:</strong> LKR <span th:text="${bike.hourlyRate}"></span>/hour</div>
 
@@ -280,7 +281,7 @@
                                th:text="${#strings.equalsIgnoreCase(bike.status, 'AVAILABLE')} ? 'Login to Book' : 'Login to View Booking Options'"></a>
                         </div>
 
-                        <form th:if="${session.currentUser != null and #strings.equalsIgnoreCase(session.currentUser.role, 'RIDER') and #strings.equalsIgnoreCase(bike.status, 'AVAILABLE')}"
+                        <form th:if="${session.currentUser != null and (#strings.equalsIgnoreCase(session.currentUser.role, 'RIDE_SHARER') or #strings.equalsIgnoreCase(session.currentUser.role, 'RIDER')) and #strings.equalsIgnoreCase(bike.status, 'AVAILABLE')}"
                               th:action="@{/addRideBooking}" method="post" class="row g-2 mt-3">
                             <input type="hidden" name="bikeId" th:value="${bike.id}">
                             <div class="col-12">

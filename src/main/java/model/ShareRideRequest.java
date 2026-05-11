@@ -11,15 +11,21 @@ public class ShareRideRequest {
     private String pickupPoint;
     private String stopPoint;
     private String status;
+    private String passengerPickupTime;
 
     public ShareRideRequest() {
     }
 
     public ShareRideRequest(String requesterUsername, String pickupPoint, String stopPoint, String status) {
+        this(requesterUsername, pickupPoint, stopPoint, status, "");
+    }
+
+    public ShareRideRequest(String requesterUsername, String pickupPoint, String stopPoint, String status, String passengerPickupTime) {
         this.requesterUsername = requesterUsername;
         this.pickupPoint = pickupPoint;
         this.stopPoint = stopPoint;
         this.status = status;
+        this.passengerPickupTime = passengerPickupTime;
     }
 
     public String getRequesterUsername() {
@@ -54,13 +60,22 @@ public class ShareRideRequest {
         this.status = status;
     }
 
+    public String getPassengerPickupTime() {
+        return passengerPickupTime;
+    }
+
+    public void setPassengerPickupTime(String passengerPickupTime) {
+        this.passengerPickupTime = passengerPickupTime;
+    }
+
     public String toRecord() {
-        return encode(requesterUsername) + "," + encode(pickupPoint) + "," + encode(stopPoint) + "," + encode(status);
+        return encode(requesterUsername) + "," + encode(pickupPoint) + "," + encode(stopPoint) + ","
+                + encode(status) + "," + encode(passengerPickupTime);
     }
 
     public static ShareRideRequest fromRecord(String record) {
-        String[] parts = record.split(",", 4);
-        if (parts.length != 4) {
+        String[] parts = record.split(",", 5);
+        if (parts.length < 4) {
             return null;
         }
 
@@ -68,7 +83,8 @@ public class ShareRideRequest {
                 decode(parts[0]),
                 decode(parts[1]),
                 decode(parts[2]),
-                decode(parts[3])
+                decode(parts[3]),
+                parts.length == 5 ? decode(parts[4]) : ""
         );
     }
 

@@ -37,8 +37,10 @@
                         <div class="mb-3">
                             <label class="form-label">Role</label>
                             <select name="role" class="form-select" required>
-                                <option value="RIDER" th:selected="${#strings.equalsIgnoreCase(managedUser.role, 'RIDER')}">Rider</option>
-                                <option value="OPERATOR" th:selected="${#strings.equalsIgnoreCase(managedUser.role, 'OPERATOR')}">Operator</option>
+                                <option value="OPERATOR" th:selected="${#strings.equalsIgnoreCase(managedUser.role, 'OPERATOR')}">Bike Owner / Rental Provider</option>
+                                <option value="RIDE_SHARER" th:selected="${#strings.equalsIgnoreCase(managedUser.role, 'RIDE_SHARER')}">Ride Sharer</option>
+                                <option value="RIDE_BOOKER" th:selected="${#strings.equalsIgnoreCase(managedUser.role, 'RIDE_BOOKER')}">Ride Booker / Passenger</option>
+                                <option value="RIDER" th:selected="${#strings.equalsIgnoreCase(managedUser.role, 'RIDER')}">Legacy Rider</option>
                                 <option value="ADMIN" th:selected="${#strings.equalsIgnoreCase(managedUser.role, 'ADMIN')}">Admin</option>
                             </select>
                         </div>

@@ -42,6 +42,18 @@
                             <input type="number" name="durationHours" class="form-control" min="1" th:value="${booking.durationHours}" required>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Bike Pickup Time</label>
+                            <input type="time" class="form-control" th:value="${booking.rentalPickupTime}" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Bike Return Time</label>
+                            <input type="time" class="form-control" th:value="${booking.rentalReturnTime}" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Renter Phone Number</label>
+                            <input type="text" class="form-control" th:value="${booking.renterPhoneNumber}" disabled>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Pickup Point</label>
                             <input type="text" name="pickupPoint" class="form-control" th:value="${booking.pickupPoint}" required>
                         </div>
@@ -52,7 +64,9 @@
                         <div class="mb-3">
                             <label class="form-label">Status</label>
                             <select name="status" class="form-select" required>
+                                <option value="PENDING_OWNER_APPROVAL" th:selected="${#strings.equalsIgnoreCase(booking.status, 'PENDING_OWNER_APPROVAL')}">Waiting for Owner Approval</option>
                                 <option value="REQUESTED" th:selected="${#strings.equalsIgnoreCase(booking.status, 'REQUESTED')}">Requested</option>
+                                <option value="OPEN_TO_SHARE" th:selected="${#strings.equalsIgnoreCase(booking.status, 'OPEN_TO_SHARE')}">Open to Share</option>
                                 <option value="CONFIRMED" th:selected="${#strings.equalsIgnoreCase(booking.status, 'CONFIRMED')}">Confirmed</option>
                                 <option value="COMPLETED" th:selected="${#strings.equalsIgnoreCase(booking.status, 'COMPLETED')}">Completed</option>
                                 <option value="CANCELLED" th:selected="${#strings.equalsIgnoreCase(booking.status, 'CANCELLED')}">Cancelled</option>

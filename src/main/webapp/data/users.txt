@@ -1,12 +1,3 @@
-admin:admin123:ADMIN
-test:123456:RIDER
-mufmoh:123456:OPERATOR
-ashif:123:OPERATOR
-testbook1:123:RIDER
-testbook2:123:RIDER
-test0:123:OPERATOR
-test1:123:RIDER
-test2:123:RIDER
-iroshan:iroshan123:RIDER
-arshad:arshad123:OPERATOR
-Mufthi:Mufthi123:RIDER
+ahmed1:ahmed123:OPERATOR
+ahmed2:ahmed123:RIDE_SHARER
+ahmed3:ahmed123:RIDE_BOOKER

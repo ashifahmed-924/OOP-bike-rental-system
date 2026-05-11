@@ -41,10 +41,21 @@ public class RideBookingController extends BaseWebController {
         model.addAttribute("bikes", bikes);
         model.addAttribute("bookedBikeIds", getBookedBikeIds(allBookings));
 
+        model.addAttribute("canBookBikes", canBookBikes(currentUser));
+        model.addAttribute("canJoinSharedRides", canJoinSharedRides(currentUser));
+        model.addAttribute("canManageShareRequests", canManageShareRequests(currentUser));
+
         if ("OPERATOR".equalsIgnoreCase(currentUser.getRole())) {
-            model.addAttribute("rideBookings", getBookingsForOperatorBikes(allBookings, bikes, currentUser.getUsername()));
+            List<RideBooking> operatorBookings = getBookingsForOperatorBikes(allBookings, bikes, currentUser.getUsername());
+            model.addAttribute("rideBookings", operatorBookings);
+            model.addAttribute("pendingRentalRequests", getBookingsByStatus(operatorBookings, "PENDING_OWNER_APPROVAL"));
+        } else if ("RIDE_BOOKER".equalsIgnoreCase(currentUser.getRole())) {
+            model.addAttribute("rideBookings", getJoinedBookings(allBookings, currentUser.getUsername()));
+            model.addAttribute("shareableBookings", getShareableBookings(allBookings, currentUser.getUsername()));
         } else {
-            model.addAttribute("rideBookings", bookingDAO.getBookingsByUsername(currentUser.getUsername()));
+            List<RideBooking> userBookings = bookingDAO.getBookingsByUsername(currentUser.getUsername());
+            model.addAttribute("rideBookings", userBookings);
+            model.addAttribute("pendingRentalRequests", getBookingsByStatus(userBookings, "PENDING_OWNER_APPROVAL"));
             model.addAttribute("shareableBookings", getShareableBookings(allBookings, currentUser.getUsername()));
         }
 
@@ -56,6 +67,9 @@ public class RideBookingController extends BaseWebController {
                                  @RequestParam int durationHours,
                                  @RequestParam String pickupPoint,
                                  @RequestParam String dropPoint,
+                                 @RequestParam String rentalPickupTime,
+                                 @RequestParam String rentalReturnTime,
+                                 @RequestParam String renterPhoneNumber,
                                  HttpSession session) throws IOException {
         User currentUser = currentUser(session);
         if (currentUser == null) {
@@ -67,19 +81,62 @@ public class RideBookingController extends BaseWebController {
         if ("OPERATOR".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/bikes";
         }
+        if (!canBookBikes(currentUser)) {
+            return "redirect:/rideBookings";
+        }
 
         BikeDAO bikeDAO = new BikeDAO(dataPath());
         RideBookingDAO bookingDAO = new RideBookingDAO(dataPath());
         Bike bike = bikeDAO.getBikeById(bikeId);
-        if (bike == null || !"AVAILABLE".equalsIgnoreCase(bike.getStatus()) || bookingDAO.hasOngoingBookingForBike(bikeId)) {
+        if (bike == null || !"AVAILABLE".equalsIgnoreCase(bike.getStatus()) || bookingDAO.hasOngoingBookingForBike(bikeId)
+                || isBlank(rentalPickupTime) || isBlank(rentalReturnTime) || isBlank(renterPhoneNumber)) {
             return "redirect:/rideBookings";
         }
 
         RideBooking booking = new RideBooking(0, bike.getId(), bike.getBikeName(), currentUser.getUsername(),
-                durationHours, pickupPoint, dropPoint, "REQUESTED");
+                durationHours, pickupPoint, dropPoint, "PENDING_OWNER_APPROVAL",
+                rentalPickupTime.trim(), rentalReturnTime.trim(), renterPhoneNumber.trim(), new ArrayList<ShareRideRequest>());
         bookingDAO.addBooking(booking);
         bike.setStatus("BOOKED");
         bikeDAO.updateBike(bike);
+        return "redirect:/rideBookings";
+    }
+
+    @PostMapping("/respondBikeRentalRequest")
+    public String respondBikeRentalRequest(@RequestParam int bookingId,
+                                           @RequestParam String decision,
+                                           HttpSession session) throws IOException {
+        User currentUser = currentUser(session);
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+        if (!"OPERATOR".equalsIgnoreCase(currentUser.getRole())) {
+            return redirectByRole(currentUser);
+        }
+
+        RideBookingDAO bookingDAO = new RideBookingDAO(dataPath());
+        BikeDAO bikeDAO = new BikeDAO(dataPath());
+        RideBooking booking = bookingDAO.getBookingById(bookingId);
+        if (booking == null || !"PENDING_OWNER_APPROVAL".equalsIgnoreCase(booking.getStatus())) {
+            return "redirect:/rideBookings";
+        }
+
+        Bike bike = bikeDAO.getBikeById(booking.getBikeId());
+        if (bike == null || bike.getOperator() == null || !bike.getOperator().equalsIgnoreCase(currentUser.getUsername())) {
+            return "redirect:/rideBookings";
+        }
+
+        if ("accept".equalsIgnoreCase(decision)) {
+            booking.setStatus("OPEN_TO_SHARE");
+            bookingDAO.updateBooking(booking);
+            bike.setStatus("BOOKED");
+            bikeDAO.updateBike(bike);
+        } else {
+            booking.setStatus("CANCELLED");
+            bookingDAO.updateBooking(booking);
+            BikeStatusHelper.syncBikeStatus(dataPath(), booking.getBikeId());
+        }
+
         return "redirect:/rideBookings";
     }
 
@@ -109,6 +166,9 @@ public class RideBookingController extends BaseWebController {
         RideBooking updatedBooking = new RideBooking(id, bikeId, bikeName, username, durationHours, pickupPoint, dropPoint, status);
         if (existingBooking != null) {
             updatedBooking.setShareRequests(existingBooking.getShareRequests());
+            updatedBooking.setRentalPickupTime(existingBooking.getRentalPickupTime());
+            updatedBooking.setRentalReturnTime(existingBooking.getRentalReturnTime());
+            updatedBooking.setRenterPhoneNumber(existingBooking.getRenterPhoneNumber());
         }
         bookingDAO.updateBooking(updatedBooking);
         BikeStatusHelper.syncBikeStatus(dataPath(), bikeId);
@@ -148,7 +208,8 @@ public class RideBookingController extends BaseWebController {
         if (currentUser == null) {
             return "redirect:/login";
         }
-        if ("ADMIN".equalsIgnoreCase(currentUser.getRole()) || "OPERATOR".equalsIgnoreCase(currentUser.getRole())) {
+        if ("ADMIN".equalsIgnoreCase(currentUser.getRole()) || "OPERATOR".equalsIgnoreCase(currentUser.getRole())
+                || !canJoinSharedRides(currentUser)) {
             return "redirect:/rideBookings";
         }
 
@@ -158,7 +219,7 @@ public class RideBookingController extends BaseWebController {
         RideBooking booking = bookingDAO.getBookingById(bookingId);
 
         if (pickupPoint == null || pickupPoint.isEmpty() || stopPoint == null || stopPoint.isEmpty()
-                || booking == null || !booking.isOngoing() || booking.isOwner(currentUser.getUsername())
+                || booking == null || !booking.isShareable() || booking.isOwner(currentUser.getUsername())
                 || booking.hasShareRequestFrom(currentUser.getUsername())) {
             return "redirect:/rideBookings";
         }
@@ -172,23 +233,29 @@ public class RideBookingController extends BaseWebController {
     public String respondShareRideRequest(@RequestParam int bookingId,
                                           @RequestParam String requesterUsername,
                                           @RequestParam String decision,
+                                          @RequestParam(required = false) String passengerPickupTime,
                                           HttpSession session) throws IOException {
         User currentUser = currentUser(session);
         if (currentUser == null) {
             return "redirect:/login";
         }
-        if ("ADMIN".equalsIgnoreCase(currentUser.getRole()) || "OPERATOR".equalsIgnoreCase(currentUser.getRole())) {
+        if ("ADMIN".equalsIgnoreCase(currentUser.getRole()) || "OPERATOR".equalsIgnoreCase(currentUser.getRole())
+                || !canManageShareRequests(currentUser)) {
             return "redirect:/rideBookings";
         }
 
         String nextStatus = "accept".equalsIgnoreCase(decision) ? "ACCEPTED" : "DECLINED";
+        String pickupTime = passengerPickupTime == null ? "" : passengerPickupTime.trim();
+        if ("ACCEPTED".equalsIgnoreCase(nextStatus) && pickupTime.isEmpty()) {
+            return "redirect:/rideBookings";
+        }
         RideBookingDAO bookingDAO = new RideBookingDAO(dataPath());
         RideBooking booking = bookingDAO.getBookingById(bookingId);
         if (booking == null || !booking.isOwner(currentUser.getUsername()) || !booking.isOngoing()) {
             return "redirect:/rideBookings";
         }
 
-        if (booking.updateShareRequestStatus(requesterUsername, nextStatus)) {
+        if (booking.updateShareRequestStatus(requesterUsername, nextStatus, pickupTime)) {
             if ("ACCEPTED".equalsIgnoreCase(nextStatus)) {
                 booking.setStatus("CONFIRMED");
             }
@@ -200,11 +267,21 @@ public class RideBookingController extends BaseWebController {
     private List<RideBooking> getShareableBookings(List<RideBooking> allBookings, String currentUsername) {
         List<RideBooking> shareableBookings = new ArrayList<RideBooking>();
         for (RideBooking booking : allBookings) {
-            if (booking.isOngoing() && !booking.isOwner(currentUsername)) {
+            if (booking.isShareable() && !booking.isOwner(currentUsername)) {
                 shareableBookings.add(booking);
             }
         }
         return shareableBookings;
+    }
+
+    private List<RideBooking> getJoinedBookings(List<RideBooking> allBookings, String currentUsername) {
+        List<RideBooking> joinedBookings = new ArrayList<RideBooking>();
+        for (RideBooking booking : allBookings) {
+            if (booking.hasShareRequestFrom(currentUsername)) {
+                joinedBookings.add(booking);
+            }
+        }
+        return joinedBookings;
     }
 
     private Set<Integer> getBookedBikeIds(List<RideBooking> allBookings) {
@@ -232,5 +309,31 @@ public class RideBookingController extends BaseWebController {
             }
         }
         return operatorBookings;
+    }
+
+    private List<RideBooking> getBookingsByStatus(List<RideBooking> bookings, String status) {
+        List<RideBooking> matches = new ArrayList<RideBooking>();
+        for (RideBooking booking : bookings) {
+            if (status.equalsIgnoreCase(booking.getStatus())) {
+                matches.add(booking);
+            }
+        }
+        return matches;
+    }
+
+    private boolean canBookBikes(User user) {
+        return user != null && ("RIDE_SHARER".equalsIgnoreCase(user.getRole()) || "RIDER".equalsIgnoreCase(user.getRole()));
+    }
+
+    private boolean canJoinSharedRides(User user) {
+        return user != null && ("RIDE_BOOKER".equalsIgnoreCase(user.getRole()) || "RIDER".equalsIgnoreCase(user.getRole()));
+    }
+
+    private boolean canManageShareRequests(User user) {
+        return user != null && ("RIDE_SHARER".equalsIgnoreCase(user.getRole()) || "RIDER".equalsIgnoreCase(user.getRole()));
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

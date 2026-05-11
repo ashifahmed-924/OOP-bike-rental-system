@@ -1,3 +1,1 @@
-1:Grazia:Hero:Colombo:2000.0:BOOKED:ashif
-2:FZ-V2:Yamaha:Kandy:500.0:BOOKED:test0
-3:MT15:Yamaha:Kandy:499.88:BOOKED:arshad
+1:MT15 - 1234:Motor bike:Kandy:149.92:BOOKED:ahmed1:0711234456
