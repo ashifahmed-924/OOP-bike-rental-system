@@ -54,6 +54,10 @@ body {
     border-radius: 24px 24px 0 0;
 }
 
+.app-card .card-body {
+    min-width: 0;
+}
+
 .app-gradient-primary {
     background: linear-gradient(135deg, #0f4c81 0%, #1d4ed8 100%);
     color: #fff;
@@ -97,6 +101,10 @@ body {
 .btn {
     border-radius: 12px;
     font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
 }
 
 .btn-primary {
@@ -124,6 +132,11 @@ body {
 .table > :not(caption) > * > * {
     padding-top: 0.9rem;
     padding-bottom: 0.9rem;
+    vertical-align: middle;
+}
+
+.table td .btn + .btn {
+    margin-left: 0.35rem;
 }
 
 .app-chip {
@@ -159,5 +172,42 @@ body {
     .app-hero {
         padding: 1.25rem;
         border-radius: 22px;
+    }
+
+    .app-hero > .d-flex,
+    .app-hero.d-flex {
+        align-items: stretch !important;
+    }
+
+    .app-hero .btn {
+        width: 100%;
+    }
+
+    .app-card,
+    .app-panel,
+    .app-table-card {
+        border-radius: 18px;
+    }
+
+    .app-card .card-header,
+    .app-panel-header {
+        border-radius: 18px 18px 0 0;
+    }
+
+    .table-responsive {
+        border-radius: 14px;
+    }
+
+    .table > :not(caption) > * > * {
+        white-space: nowrap;
+    }
+
+    .table td .btn {
+        width: 100%;
+        margin-bottom: 0.35rem;
+    }
+
+    .table td .btn + .btn {
+        margin-left: 0;
     }
 }
