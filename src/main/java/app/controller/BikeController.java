@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @Controller
+// OOP: Inheritance - BikeController reuses common helper methods from BaseWebController.
 public class BikeController extends BaseWebController {
 
     @GetMapping("/bikes")

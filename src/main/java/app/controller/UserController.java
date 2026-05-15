@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @Controller
+// OOP: Inheritance - UserController reuses common helper methods from BaseWebController.
 public class UserController extends BaseWebController {
 
     @GetMapping("/users")

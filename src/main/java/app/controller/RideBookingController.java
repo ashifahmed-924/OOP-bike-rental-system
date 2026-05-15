@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 @Controller
+// OOP: Inheritance - RideBookingController reuses common helper methods from BaseWebController.
 public class RideBookingController extends BaseWebController {
 
     @GetMapping("/rideBookings")

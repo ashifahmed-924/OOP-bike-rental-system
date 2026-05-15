@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+// OOP: Inheritance - PageController reuses common helper methods from BaseWebController.
 public class PageController extends BaseWebController {
 
     @GetMapping("/")

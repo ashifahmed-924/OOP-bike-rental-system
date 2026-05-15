@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShareRideRequest {
+    // OOP: Encapsulation - request data is private and is accessed through getters and setters.
     private String requesterUsername;
     private String pickupPoint;
     private String stopPoint;
@@ -17,6 +18,7 @@ public class ShareRideRequest {
     public ShareRideRequest() {
     }
 
+    // OOP: Constructor overloading - multiple constructors let us create the object with different amounts of data.
     public ShareRideRequest(String requesterUsername, String pickupPoint, String stopPoint, String status) {
         this(requesterUsername, pickupPoint, stopPoint, status, "", "");
     }

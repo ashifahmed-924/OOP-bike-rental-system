@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
+// OOP: Abstraction - this base controller stores common helper methods for all web controllers.
 abstract class BaseWebController {
 
+    // OOP: Encapsulation - the ServletContext field is private and used only through methods in this class.
     @Autowired
     private ServletContext servletContext;
 

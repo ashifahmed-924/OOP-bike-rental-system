@@ -7,6 +7,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 public class RideBooking {
+    // OOP: Encapsulation - booking details are private and are accessed through public methods.
     private int id;
     private int bikeId;
     private String bikeName;
@@ -24,6 +25,7 @@ public class RideBooking {
         this.shareRequests = new ArrayList<>();
     }
 
+    // OOP: Constructor overloading - this shorter constructor reuses the longer constructor with default values.
     public RideBooking(int id, int bikeId, String bikeName, String username, int durationHours, String pickupPoint, String dropPoint, String status) {
         this(id, bikeId, bikeName, username, durationHours, pickupPoint, dropPoint, status, new ArrayList<ShareRideRequest>());
     }
@@ -101,6 +103,7 @@ public class RideBooking {
         return "Requested";
     }
 
+    // OOP: Encapsulation - this returns a copy, so outside code cannot directly change the internal list.
     public List<ShareRideRequest> getShareRequests() { return new ArrayList<>(shareRequests); }
     public void setShareRequests(List<ShareRideRequest> shareRequests) {
         this.shareRequests = shareRequests == null ? new ArrayList<ShareRideRequest>() : new ArrayList<>(shareRequests);
@@ -166,6 +169,7 @@ public class RideBooking {
         return false;
     }
 
+    // OOP: Encapsulation - this private helper hides filtering logic inside the class.
     private List<ShareRideRequest> filterShareRequestsByStatus(String targetStatus) {
         List<ShareRideRequest> filtered = new ArrayList<>();
         for (ShareRideRequest shareRequest : shareRequests) {
@@ -176,6 +180,7 @@ public class RideBooking {
         return filtered;
     }
 
+    // OOP: Polymorphism - this overrides Object.toString() with a RideBooking-specific text format.
     @Override
     public String toString() {
         return id + ":" + bikeId + ":" + bikeName + ":" + username + ":" + durationHours + ":" + pickupPoint + ":"

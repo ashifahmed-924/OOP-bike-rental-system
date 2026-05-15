@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @Controller
+// OOP: Inheritance - AuthController reuses common helper methods from BaseWebController.
 public class AuthController extends BaseWebController {
 
     @PostMapping("/login")
